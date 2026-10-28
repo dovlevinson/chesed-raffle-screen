@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chesed raffle screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Smokum&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--brown:#5B3714;--navy:#173C78;--gold:#C9952E;--goldlt:#F3D27C}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#2a1d10;overflow:hidden}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#f{position:relative;width:min(100vw,177.78vh);height:min(56.25vw,100vh);font-size:min(1vw,1.778vh);overflow:hidden;
+ background:radial-gradient(ellipse at 72% 40%,#F8EEDC 0,#E6D3B3 45%,#B99C77 100%)}
+.hd{font-family:Smokum,Georgia,serif;font-variant:small-caps;color:var(--brown);white-space:nowrap}
+.ul{text-decoration:underline;text-decoration-thickness:.07em;text-underline-offset:.12em}
+
+/* left: the column frame with the scrolling ticket list */
+.frame{position:absolute;left:2.5em;top:0;height:100%;aspect-ratio:993/1284;background:url(img/frame.jpg) center/100% 100% no-repeat}
+.panel{position:absolute;left:13.5%;right:13.5%;top:15%;bottom:12.5%;display:flex;flex-direction:column;align-items:center}
+.panel .hd{font-size:4.4em}
+.upd{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--brown);font-size:1.05em;opacity:.8;margin:-1.6em 0 .3em;white-space:nowrap}
+.panel .hd{margin-bottom:.15em}
+.window{position:relative;flex:1;width:100%;overflow:hidden;
+ -webkit-mask-image:linear-gradient(transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(transparent 0,#000 9%,#000 91%,transparent 100%)}
+#list{position:absolute;left:0;right:0;top:0;will-change:transform}
+.row{display:flex;align-items:center;justify-content:space-between;gap:1em;height:3.6em;padding:0 .4em 0 .9em;border-bottom:.08em solid rgba(91,55,20,.18)}
+.row .n{font-family:"Libre Baskerville",Georgia,serif;font-weight:700;color:var(--navy);font-size:1.75em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* students who earned the lunch (5+ tickets = 5+ confirmed hours) */
+.row.win{height:4.6em;margin:.35em 0;border:.12em solid var(--gold);border-radius:.8em;padding-left:.5em;
+ background:linear-gradient(90deg,rgba(251,231,166,.95),rgba(243,210,124,.55) 70%,rgba(243,210,124,.25));box-shadow:0 .15em .4em rgba(91,55,20,.25)}
+.row.win .who{display:flex;align-items:center;gap:.55em;min-width:0}
+.row.win .fork{height:3.1em;flex:none;filter:drop-shadow(0 .1em .15em rgba(60,35,10,.4))}
+.row.win .n{font-family:Smokum,Georgia,serif;font-weight:400;font-variant:small-caps;color:var(--brown);font-size:2.6em;letter-spacing:.02em}
+.badge{flex:none;display:flex;align-items:center;gap:.35em;padding:.25em .75em .25em .45em;border-radius:2em;
+ background:linear-gradient(180deg,#FBE7A6,#E2B550 55%,#C9952E);box-shadow:0 .12em .3em rgba(91,55,20,.35),inset 0 .1em 0 rgba(255,255,255,.6)}
+.badge img{height:1.7em}
+.badge span{font-family:"Libre Baskerville",Georgia,serif;font-weight:700;color:#4a2c0c;font-size:1.6em;min-width:1.3em;text-align:center}
+
+/* right: title, prize spotlight, call to action */
+.logo{height:3em;margin-bottom:.8em}
+.right{position:absolute;left:46em;right:2.5em;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#title{font-size:5em}
+.sub{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--brown);font-size:1.6em;margin:0 0 .7em}
+.spot{position:relative;width:44em;height:21em}
+.rays{position:absolute;inset:-7em -4em;border-radius:50%;opacity:.55;animation:spin 40s linear infinite;
+ background:repeating-conic-gradient(from 0deg,rgba(255,236,170,0) 0 7deg,rgba(255,226,140,.75) 7deg 11deg);
+ -webkit-mask-image:radial-gradient(closest-side,#000 40%,transparent 100%);mask-image:radial-gradient(closest-side,#000 40%,transparent 100%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card{position:absolute;inset:0;border-radius:1.6em;background:#fff;border:.35em solid var(--gold);overflow:hidden;
+ box-shadow:0 0 0 .35em #fff8e6,0 0 0 .6em var(--gold),0 1.2em 2.5em rgba(60,35,10,.35);display:flex;flex-direction:column}
+.pics{position:relative;flex:1}
+.slide{position:absolute;inset:1.4em 2em;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.92);transition:opacity .9s,transform .9s}
+.slide.on{opacity:1;transform:none}
+.slide img{max-width:100%;max-height:100%;object-fit:contain}
+.pbar{flex:none;height:5.2em;display:flex;align-items:center;justify-content:center;padding:0 1.5em;
+ background:linear-gradient(180deg,#FFF8E6,#F2DFAE);border-top:.22em solid var(--gold)}
+#pname{font-family:Smokum,Georgia,serif;font-variant:small-caps;color:var(--brown);font-size:3em;line-height:1;white-space:nowrap;transition:opacity .5s}
+.thumbs{display:flex;gap:1.3em;margin-top:1.6em}
+.thumbs div{width:4.8em;height:4.8em;border-radius:50%;background:#fff center/72% no-repeat;border:.25em solid rgba(201,149,46,.45);transition:transform .5s,border-color .5s,box-shadow .5s}
+.thumbs div.on{border-color:var(--gold);transform:scale(1.15);box-shadow:0 0 1.2em rgba(243,210,124,.9)}
+.cta{margin-top:1.8em;width:44em;background:var(--navy);border:.25em solid var(--gold);border-radius:1.2em;padding:.8em 2em;display:flex;align-items:center;justify-content:center;gap:1.5em}
+.cta img{height:3.8em}
+#bottom{font-family:Smokum,Georgia,serif;font-variant:small-caps;color:var(--goldlt);font-size:3.2em;line-height:1.15;text-align:left}
+#bottom span{display:block}
+/* sentences that end in "!" bounce to draw the eye */
+#bottom .pop{display:inline-block;transform-origin:50% 80%;animation:pop 1.6s ease-in-out infinite;color:#FFE9A8;text-shadow:0 0 .4em rgba(243,210,124,.6)}
+@keyframes pop{0%,55%,100%{transform:translateY(0) scale(1)}20%{transform:translateY(-.28em) scale(1.08)}35%{transform:translateY(0) scale(.98)}45%{transform:translateY(-.08em) scale(1.02)}}
+.note{margin-top:1em;max-width:30em;font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--brown);font-size:1.35em;line-height:1.35;text-align:center}
+.note:empty{display:none}
+</style>
+</head>
+<body>
+<div id="stage"><div id="f">
+ <div class="frame"><div class="panel">
+  <div class="upd" id="upd"></div>
+  <div class="hd ul">Raffle Tickets</div>
+  <div class="window"><div id="list"></div></div>
+ </div></div>
+ <div class="right">
+  <img class="logo" src="img/moriah.png" alt="The Moriah School">
+  <div class="hd" id="title"></div>
+  <div class="sub">Prizes you can win</div>
+  <div class="spot"><div class="rays"></div><div class="card"><div class="pics" id="pics"></div><div class="pbar"><div id="pname"></div></div></div></div>
+  <div class="thumbs" id="thumbs"></div>
+  <div class="cta"><img src="img/ticket.png" alt=""><div id="bottom"></div></div>
+  <div class="note" id="note"></div>
+ </div>
+</div></div>
+<script src="data.js"></script>
+<script>
+// Everything shown comes from the Google Sheet (tabs Tickets, Prizes, Settings).
+// data.js holds a snapshot that is used until the sheet answers.
+const SPEED = 95;          // scroll speed, pixels per second at 1920 wide
+const PRIZE_SECONDS = 6;   // how long each prize stays in the spotlight
+const RELOAD_MINUTES = 5;
+const LUNCH_TICKETS = 5;   // 5+ tickets means 5+ confirmed hours, so the lunch was earned
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pic = p => /^(https?:)?\/\//i.test(p) || p.startsWith('data:') ? p : 'img/' + p;
+
+let data = null, prizeTimer = null, prizeIdx = 0;
+
+function render(d){
+  data = d;
+  const s = d.settings || {};
+  $('title').textContent = s['Title'] || 'Raffle';
+  // one line per sentence; a sentence ending in "!" bounces
+  const said = String(s['Bottom line'] || 'Log your hours today!').match(/[^.!?]+[.!?]*/g) || [];
+  $('bottom').innerHTML = said.map(x => x.trim()).filter(Boolean)
+    .map(x => x.endsWith('!') ? `<span><span class="pop">${esc(x)}</span></span>` : `<span>${esc(x)}</span>`).join('');
+  $('note').textContent = s['Note'] || '';
+
+  const t = d.tickets.filter(r => r[0] && +r[1] > 0).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
+  $('upd').textContent = s['Updated'] ? `Updated ${s['Updated']}` : '';
+  const badge = r => `<div class="badge"><img src="img/ticket.png" alt=""><span>${+r[1]}</span></div>`;
+  const rows = t.map(r => +r[1] >= LUNCH_TICKETS
+    ? `<div class="row win"><div class="who"><img class="fork" src="img/fork.png" alt="Earned the lunch"><div class="n">${esc(r[0])}</div></div>${badge(r)}</div>`
+    : `<div class="row"><div class="n">${esc(r[0])}</div>${badge(r)}</div>`).join('');
+  $('list').innerHTML = rows;
+  $('list').dataset.loop = '0';
+  requestAnimationFrame(() => {
+    const win = document.querySelector('.window');
+    if ($('list').scrollHeight > win.clientHeight) { $('list').innerHTML = rows + rows; $('list').dataset.loop = '1'; }
+  });
+
+  const p = d.prizes.filter(r => r[0]);
+  $('pics').innerHTML = p.map((r,i) => `<div class="slide" data-i="${i}"><img src="${esc(pic(r[1]||''))}" alt=""></div>`).join('');
+  $('thumbs').innerHTML = p.map(r => `<div style="background-image:url('${esc(pic(r[1]||''))}')"></div>`).join('');
+  prizeIdx = prizeIdx % Math.max(p.length,1);
+  showPrize();
+  clearInterval(prizeTimer);
+  if (p.length > 1) prizeTimer = setInterval(() => { prizeIdx = (prizeIdx+1) % p.length; showPrize(); }, PRIZE_SECONDS*1000);
+}
+
+function showPrize(){
+  const p = data.prizes.filter(r => r[0]);
+  document.querySelectorAll('.slide').forEach(e => e.classList.toggle('on', +e.dataset.i === prizeIdx));
+  document.querySelectorAll('#thumbs div').forEach((e,i) => e.classList.toggle('on', i === prizeIdx));
+  const n = $('pname');
+  n.textContent = p[prizeIdx] ? p[prizeIdx][0] : '';
+  // shrink long prize names so they stay on one line
+  n.style.fontSize = '';
+  const room = n.parentElement.clientWidth * 0.94;
+  if (n.scrollWidth > room) n.style.fontSize = (3 * room / n.scrollWidth) + 'em';
+}
+
+// continuous scroll; the list is doubled so the loop has no seam
+let y = 0, last = performance.now();
+function tick(now){
+  const L = $('list'), dt = Math.min(now - last, 100) / 1000; last = now;
+  if (L.dataset.loop === '1') {
+    const half = L.scrollHeight / 2, scale = $('f').clientWidth / 1920;
+    y = (y + SPEED * scale * dt) % half;
+    L.style.transform = `translateY(${-y}px)`;
+  } else { y = 0; L.style.transform = ''; }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+// Google Sheet via the visualization endpoint (JSONP, so no CORS setup is needed).
+// The sheet must be shared as "Anyone with the link can view".
+function sheet(tab){
+  return new Promise((ok, fail) => {
+    const cb = '__cb' + Math.random().toString(36).slice(2), sc = document.createElement('script');
+    const done = () => { delete window[cb]; sc.remove(); clearTimeout(to); };
+    const to = setTimeout(() => { done(); fail('timeout'); }, 15000);
+    window[cb] = res => { done(); res && res.status !== 'error' ? ok(res.table) : fail('error'); };
+    sc.onerror = () => { done(); fail('load'); };
+    sc.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&sheet=${encodeURIComponent(tab)}&tqx=responseHandler:${cb}&t=${Date.now()}`;
+    document.head.appendChild(sc);
+  });
+}
+const cells = tbl => tbl.rows.map(r => r.c.map(c => c ? (c.v ?? '') : ''));
+
+async function load(){
+  try {
+    const [t, p, s] = await Promise.all([sheet('Tickets'), sheet('Prizes'), sheet('Settings')]);
+    const settings = {}; cells(s).forEach(r => { if (r[0]) settings[r[0]] = r[1]; });
+    render({
+      tickets: cells(t).map(r => [String(r[0]).trim(), Math.floor(+r[1] || 0)]),
+      prizes: cells(p).filter(r => String(r[2] || 'Yes').trim().toLowerCase() !== 'no').map(r => [String(r[0]).trim(), String(r[1]).trim()]),
+      settings
+    });
+  } catch(e) { /* keep showing what we have */ }
+}
+
+render(window.SNAPSHOT);
+load();
+setInterval(load, RELOAD_MINUTES * 60 * 1000);
+</script>
+</body>
+</html>
