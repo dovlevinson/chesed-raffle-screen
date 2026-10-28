@@ -21,6 +21,10 @@ html,body{height:100%;background:#2a1d10;overflow:hidden}
 .panel .hd{font-size:4.4em}
 .upd{font-family:"Libre Baskerville",Georgia,serif;font-style:italic;color:var(--brown);font-size:1.05em;opacity:.8;margin:-1.6em 0 .3em;white-space:nowrap}
 .panel .hd{margin-bottom:.15em}
+.legend{display:flex;justify-content:center;gap:2.2em;margin:.5em 0 .8em}
+.legend div{display:flex;align-items:center;gap:.5em;text-align:left}
+.legend img{height:3em}
+.legend span{font-family:Smokum,Georgia,serif;font-variant:small-caps;color:var(--brown);font-size:1.75em;line-height:1.05;white-space:nowrap}
 .window{position:relative;flex:1;width:100%;overflow:hidden;
  -webkit-mask-image:linear-gradient(transparent 0,#000 9%,#000 91%,transparent 100%);mask-image:linear-gradient(transparent 0,#000 9%,#000 91%,transparent 100%)}
 #list{position:absolute;left:0;right:0;top:0;will-change:transform}
@@ -75,6 +79,7 @@ html,body{height:100%;background:#2a1d10;overflow:hidden}
  <div class="frame"><div class="panel">
   <div class="upd" id="upd"></div>
   <div class="hd ul">Raffle Tickets</div>
+  <div class="legend"><div><img src="img/fork.png" alt=""><span>Special Lunch<br>for 5 hours</span></div><div><img src="img/ticket.png" alt=""><span>Raffle Tickets<br>1 per hour</span></div></div>
   <div class="window"><div id="list"></div></div>
  </div></div>
  <div class="right">
